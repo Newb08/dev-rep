@@ -1,5 +1,5 @@
-const https = require('https'); 
-const readline = require('readline'); 
+const https = require('https');
+const readline = require('readline');
 
 const apiKey = '0a02ada2b2d441929da9df8678a9014f';
 
@@ -67,33 +67,32 @@ const displayData = (category, news) => {
     }
 };
 
-async function main() {
-    while(true){
-        try {
-            const number = await askQuestion("Enter your choice (1-7) or type 'exit' to quit: ");
-            if(number.toLowerCase() === 'exit'){
-                rl.close();
-                break;
-            }
-            const category = categoryMap[number];
+const handleUserInput = (number) => {
+    const category = categoryMap[number];
 
-            if (!category) {
-                console.log("Invalid selection. Please enter a valid number between 1 and 7.");
-                rl.close();
-                return;
-            }
-
-            const url = `https://newsapi.org/v2/top-headlines?category=${category}&apiKey=${apiKey}`;
-            const options = {
-                headers: { 'User-Agent': 'MyNewsApp/1.0' }
-            };
-
-            const news = await fetchData(url, options);
-            displayData(category, news);
-        } catch (err) {
-            console.error("Error:", err.message);
-        }
+    if (!category) {
+        throw new Error("Invalid selection. Please enter a valid number between 1 and 7.");
     }
-}
 
-main();
+    const url = `https://newsapi.org/v2/top-headlines?category=${category}&apiKey=${apiKey}`;
+    const options = {
+        headers: { 'User-Agent': 'MyNewsApp/1.0' }
+    };
+
+    return { url, options, category };
+};
+
+askQuestion("Enter your choice (1-7): ")
+    .then((number) => {
+        const { url, options, category } = handleUserInput(number);
+        return fetchData(url, options).then((news) => ({ category, news }));
+    })
+    .then(({ category, news }) => {
+        displayData(category, news);
+    })
+    .catch((err) => {
+        console.error("Error:", err.message);
+    })
+    .finally(() => {
+        rl.close();
+    });
