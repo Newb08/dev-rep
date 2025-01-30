@@ -18,60 +18,68 @@ const categoryMap = {
     7: "technology"
 };
 
-console.log("Select a news category:");
+console.log("Select a news category (or type 'exit' to quit):");
 for (let key in categoryMap) {
     console.log(`Press ${key} for ${categoryMap[key]} news`);
 }
 
-rl.question("Enter your choice (1-7): ", (num) => {
-    const category = categoryMap[num];
-
-    if (!category) {
-        console.log("Invalid selection. Please enter a valid number between 1 and 7.");
-        rl.close();
-        return;
+const displayData = (category, news) => {
+    if (news.status === 'ok' && news.articles.length > 0) {
+        console.log(`\nTop Headlines in ${category}:\n`);
+        news.articles.forEach((article, index) => {
+            console.log(`${index + 1}. ${article.title}`);
+            console.log(`   Link: ${article.url}\n`);
+        });
+    } else {
+        console.log('No news articles found or an error occurred:', news.message);
     }
+};
 
+function fetchAndDisplayNews(category, callback) {
     const url = `https://newsapi.org/v2/top-headlines?category=${category}&apiKey=${apiKey}`;
-    // const url = `https://newsapi.org/v2/top-headlines?country=us&category=${category}&apiKey=${apiKey}`;
-
     const options = {
-        headers: {
-            'User-Agent': 'MyNewsApp/1.0'
-        }
+        headers: { 'User-Agent': 'MyNewsApp/1.0' }
     };
 
     https.get(url, options, (res) => {
         let data = '';
-
-        // console.log(Status Code: ${res.statusCode});
 
         res.on('data', (chunk) => {
             data += chunk;
         });
 
         res.on('end', () => {
-             // console.log("Raw API Response:", data);
             try {
                 const news = JSON.parse(data);
-                //  console.log("Parsed JSON:", news);
-
-                if (news.status === 'ok' && news.articles.length > 0) {
-                    console.log(`\nTop Headlines in ${category}:\n`);
-                    news.articles.forEach((article, index) => {
-                        console.log(`${index + 1}. ${article.title}`);
-                        console.log(`   Link: ${article.url}\n`);
-                    });
-                } else {
-                    console.log('No news articles found or an error occurred:', news.message);
-                }
+                displayData(news,category);
             } catch (error) {
-                console.error(error.message);
+                console.error("Error parsing response:", error.message);
             }
-            rl.close();
+            callback(); 
         });
     }).on('error', (err) => {
         console.error(`Got error: ${err.message}`);
-        rl.close();
+        callback();
     });
-});
+}
+
+function main() {
+    rl.question("\nEnter your choice (1-7) or type 'exit' to quit: ", (num) => {
+        if (num.toLowerCase() === 'exit') {
+            console.log("Exiting the program. Goodbye!");
+            rl.close();
+            return;
+        }
+
+        const category = categoryMap[num];
+
+        if (!category) {
+            console.log("Invalid selection. Please enter a valid number between 1 and 7.");
+            main();
+        } else {
+            fetchAndDisplayNews(category, main);
+        }
+    });
+}
+
+main();
