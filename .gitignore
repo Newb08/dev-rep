@@ -7,6 +7,27 @@
 *.o
 *.so
 
+
+# Folders #
+###################
+.vscode/
+Array.js
+Calculator.js
+Object.js
+Prototypes.js
+Server/
+Task1.js
+Task2.js
+Task3.js
+async_eg.js
+example1.js
+myError.js
+node_modules/
+package-lock.json
+package.json
+tempCodeRunnerFile.js
+trial.js
+
 # Packages #
 ############
 # it's better to unpack these files and commit the raw source
