@@ -2,6 +2,9 @@ const https = require('https');
 const readline = require('readline'); 
 
 const apiKey = '0a02ada2b2d441929da9df8678a9014f';
+// Use the key below if api requests are exhausted
+
+// const apiKey = '27ee71d063cf4ad5b51cc13bb5263347';
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -18,7 +21,7 @@ const categoryMap = {
     7: "technology"
 };
 
-console.log("Select a news category:");
+console.log("Select a news category (or type 'exit' to quit)::");
 for (let key in categoryMap) {
     console.log(`Press ${key} for ${categoryMap[key]} news`);
 }
@@ -63,7 +66,7 @@ const displayData = (category, news) => {
             console.log(`   Link: ${article.url}\n`);
         });
     } else {
-        console.log('No news articles found or an error occurred:', news.message);
+        console.log('No news articles found or API key is exhausted:', news.message);
     }
 };
 
