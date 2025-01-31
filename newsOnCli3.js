@@ -2,6 +2,9 @@ const https = require('https');
 const readline = require('readline');
 
 const apiKey = '0a02ada2b2d441929da9df8678a9014f';
+// Use the key below if api requests are exhausted
+
+// const apiKey = '27ee71d063cf4ad5b51cc13bb5263347';
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -18,7 +21,7 @@ const categoryMap = {
     7: "technology"
 };
 
-console.log("Select a news category:");
+console.log("Select a news category (or type 'exit' to quit)::");
 for (let key in categoryMap) {
     console.log(`Press ${key} for ${categoryMap[key]} news`);
 }
@@ -63,16 +66,12 @@ const displayData = (category, news) => {
             console.log(`   Link: ${article.url}\n`);
         });
     } else {
-        console.log('No news articles found or an error occurred:', news.message);
+        console.log('No news articles found or API key is exhausted:', news.message);
     }
 };
 
 const handleUserInput = (number) => {
     const category = categoryMap[number];
-
-    if (!category) {
-        throw new Error("Invalid selection. Please enter a valid number between 1 and 7.");
-    }
 
     const url = `https://newsapi.org/v2/top-headlines?category=${category}&apiKey=${apiKey}`;
     const options = {
@@ -81,18 +80,28 @@ const handleUserInput = (number) => {
 
     return { url, options, category };
 };
-
-askQuestion("Enter your choice (1-7): ")
+const main = ()=>{
+    askQuestion("Enter your choice (1-7) or type 'exit' to quit: ")
     .then((number) => {
+        if(number.toLowerCase() === 'exit'){
+            rl.close();
+            return null;
+        }
+        if(!Object.keys(categoryMap).includes(`${number}`)){
+            console.log("Invalid selection. Please enter a valid number between 1 and 7.");
+            return main();
+        }
         const { url, options, category } = handleUserInput(number);
-        return fetchData(url, options).then((news) => ({ category, news }));
-    })
-    .then(({ category, news }) => {
-        displayData(category, news);
-    })
+            fetchData(url, options)
+            .then((news) => {
+                displayData(category, news);
+                return main();
+        })
+    })  
     .catch((err) => {
         console.error("Error:", err.message);
+        return main();
     })
-    .finally(() => {
-        rl.close();
-    });
+}
+
+main();
