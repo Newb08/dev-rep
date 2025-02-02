@@ -82,8 +82,7 @@ async function main() {
 
             if (!category) {
                 console.log("Invalid selection. Please enter a valid number between 1 and 7.");
-                rl.close();
-                return;
+                continue;
             }
 
             const url = `https://newsapi.org/v2/top-headlines?category=${category}&apiKey=${apiKey}`;

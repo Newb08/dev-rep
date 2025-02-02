@@ -2,7 +2,7 @@ const https = require('https');
 const readline = require('readline'); 
 
 const apiKey = '0a02ada2b2d441929da9df8678a9014f';
-// Use the key below if api requests are exhausted
+// Use following key if requests are exhausted
 
 // const apiKey = '27ee71d063cf4ad5b51cc13bb5263347';
 
@@ -54,7 +54,7 @@ function fetchAndDisplayNews(category, callback) {
         res.on('end', () => {
             try {
                 const news = JSON.parse(data);
-                displayData(news,category);
+                displayData(category, news);
             } catch (error) {
                 console.error("Error parsing response:", error.message);
             }
