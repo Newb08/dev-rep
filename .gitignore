@@ -30,8 +30,10 @@ trial.js
 Modules/
 destination.txt
 e1.txt
-folderLogs
+folderLogs.txt
 myModule.js
+dotEnv_pack.js
+.env
 
 
 # Packages #
